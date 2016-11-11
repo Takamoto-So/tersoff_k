@@ -23,9 +23,9 @@ To compile:
 Documentation
 -------------
 
-The usage of `pair_style` and `pair_coeff` is same to tersoff potential.
+The usage of `pair_style` and `pair_coeff` is same to the original tersoff potential.
 
-The usage of `fix qeq/tersoff/k` is almost same to fix qeq/reax.  
+The usage of `fix qeq/tersoff/k` is almost same to the `fix qeq/reax` command.  
 However, the 2nd and 3rd arguments (cutlo and cuthi) are not used.
 
 Other

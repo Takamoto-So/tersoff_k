@@ -1,0 +1,87 @@
+shell "mkdir cfg"
+
+units	metal
+boundary p p p
+atom_style charge
+
+lattice custom 1.0 &
+a1  4.91 0.0  0.0  &
+a2 -2.45 4.26 0.0  &
+a3  0.0  0.0  5.41 &
+basis 0.47 0.00 0.67 &
+basis 0.00 0.47 0.33 &
+basis 0.53 0.53 0.00
+
+region sim_box prism 0.0 4.91 0.0 4.26 0.0 5.41 -2.45 0.0 0.0 units box
+create_box 2 sim_box
+create_atoms 1 region sim_box
+
+lattice custom 1.0 &
+a1  4.91 0.0  0.0  &
+a2 -2.45 4.26 0.0  &
+a3  0.0  0.0  5.41 &
+basis 0.41 0.27 0.79 &
+basis 0.73 0.15 0.45 &
+basis 0.85 0.59 0.12 &
+basis 0.15 0.73 0.55 &
+basis 0.27 0.41 0.21 &
+basis 0.59 0.85 0.88
+
+create_atoms 2 region sim_box
+
+replicate 2 2 2
+
+mass	1 28.0855
+mass	2 15.9994
+
+pair_style tersoff/k
+pair_coeff * * SiO.tersoff_k Si O
+fix f_qeq all qeq/tersoff/k 1 0.0 10.0 1.0e-15 tersoff/k
+
+neighbor 2 bin
+neigh_modify every 10 delay 0 check yes
+
+timestep 0.0005
+dump d1 all cfg 100 cfg/meltquench.npt.*.cfg mass type xs ys zs id type q
+dump_modify d1 element Si O
+thermo 100
+thermo_style custom step temp etotal pe evdwl ecoul ke lx ly lz vol press
+
+fix f1 all box/relax iso 0.0 vmax 0.001
+minimize 1.0e-15 1.0e-15 1000 100000
+unfix f1
+
+velocity all create 12000.0 12345 dist gaussian mom yes
+fix f1 all nvt temp 6000 6000 0.1
+run 10000
+unfix f1
+
+write_restart cfg/melt10
+
+fix f1 all nvt temp 6000 2500 0.1
+run 20000
+unfix f1
+
+write_restart cfg/melt20
+
+fix f1 all npt temp 2500 2500 0.1 aniso 0.0 0.0 1.0
+run 100000
+unfix f1
+
+write_restart cfg/melt30
+
+fix f1 all npt temp 2500 300 0.1 aniso 0.0 0.0 1.0
+run 500
+unfix f1
+
+write_restart cfg/melt40
+
+reset_timestep 0
+
+compute myRDF all rdf 500 1 1 1 2 2 1 2 2 * *
+fix f1 all npt temp 300 300 0.1 aniso 0.0 0.0 1.0
+fix f2 all ave/time 20 100 2000 c_myRDF file tmp.rdf.l2 mode vector
+
+run 2001
+write_restart cfg/melt50
+

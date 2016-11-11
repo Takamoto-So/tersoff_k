@@ -3,8 +3,8 @@ pair tersoff_k
 
 _So Takamoto_
 
-Interatomic potential for Si oxidation.
-For potential, please see <http://dx.doi.org/10.1063/1.4965863>
+LAMMPS implementation of the interatomic potential for Si oxidation simulation.
+For potential detail, please see <http://dx.doi.org/10.1063/1.4965863>
 
 Installation
 ------------
@@ -24,7 +24,7 @@ Documentation
 
 The usage of `pair_style` and `pair_coeff` is same to tersoff potential.
 
-The usage of `fix qeq/tersoff/k` is almose same to fix qeq/reax.
+The usage of `fix qeq/tersoff/k` is almost same to fix qeq/reax.
 However, the 2nd and 3rd arguments (cutlo and cuthi) are not used.
 
 Other
